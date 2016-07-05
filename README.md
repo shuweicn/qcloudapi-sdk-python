@@ -1,4 +1,8 @@
-### qcloudapi-sdk-python
+### qcloudapi-sdk-python35
+
+由于腾讯官方版本不支持python3x, 并且代码风格过于难以接受， 所以出现了这个版本， 完全遵守PEP8.
+只在 python 3.5 版本下测试过。
+
 
 qcloudapi-sdk-python是为了让Python开发者能够在自己的代码里更快捷方便的使用腾讯云的API而开发的SDK工具包。
 
