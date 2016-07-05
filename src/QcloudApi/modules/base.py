@@ -7,10 +7,12 @@ import random
 import sys
 import os
 import warnings
+from src.QcloudApi.common.request import Request
+
 warnings.filterwarnings("ignore")
 
 sys.path.append(os.path.split(os.path.realpath(__file__))[0] + os.sep + '..')
-from common.request import Request
+
 
 class Base:
     debug = 0
@@ -19,50 +21,57 @@ class Base:
     _params = {}
 
     def __init__(self, config):
-        self.secretId = config['secretId']
-        self.secretKey = config['secretKey']
-        self.defaultRegion = config['Region']
+        self.secret_id = config['secretId']
+        self.secret_key = config['secretKey']
+        self.default_region = config['Region']
         self.method = config['method']
 
-    def _checkParams(self, action, params):
+    def _check_params(self, action, params):
         self._params = copy.deepcopy(params)
         self._params['Action'] = action[0].upper() + action[1:]
 
-        if (self._params.has_key('Region') != True):
+        if 'Region' not in self._params:
             self._params['Region'] = self.defaultRegion
 
-        if (self._params.has_key('SecretId') != True):
+        if 'SecretId' not in self._params:
             self._params['SecretId'] = self.secretId
 
-        if (self._params.has_key('Nonce') != True):
-            self._params['Nonce'] = random.randint(1, sys.maxint)
+        if 'Nonce' not in self._params:
+            maxint = int((1 << 63) - 1)
+            self._params['Nonce'] = random.randint(1, maxint)
 
-        if (self._params.has_key('Timestamp') != True):
+        if 'Timestamp' not in self._params:
             self._params['Timestamp'] = int(time.time())
 
         return self._params
 
-    def generateUrl(self, action, params):
-        self._checkParams(action, params)
-        request = Request(self.secretId, self.secretKey)
-        return request.generateUrl(self.requestHost, self.requestUri, self._params, self.method)
+    def generate_url(self, action, params):
+        self._check_params(action, params)
+        request = Request(self.secret_id, self.secret_key)
+        return request.generate_url(self.requestHost, self.requestUri,
+                                    self._params, self.method)
 
-    def call(self, action, params, files = {}):
-        self._checkParams(action, params)
-        request = Request(self.secretId, self.secretKey)
-        return request.send(self.requestHost, self.requestUri, self._params, files, self.method, self.debug)
+    def call(self, action, params, files={}):
+        self._check_params(action, params)
+        request = Request(self.secret_id, self.secret_key)
+        return request.send(self.requestHost, self.requestUri, self._params,
+                            files, self.method, self.debug)
+
 
 def main():
-    action = 'DescribeInstances'
+    action = 'DescribeUserInfo'
     config = {
-        'Region': 'gz',
-        'secretId': '你的secretId',
-        'secretKey': '你的secretKey',
+        'Region': 'bj',
+        'secretId': '',
+        'secretKey': '',
         'method': 'get',
     }
-    params = {}
+    params = {
+        'Nonce': random.randint(100000, 900000),
+        'Timestamp': int(time.time())
+    }
     base = Base(config)
-    print base.call(action, params)
+    print(base.call(action, params))
 
-if (__name__ == '__main__'):
+if __name__ == '__main__':
     main()

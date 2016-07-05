@@ -1,17 +1,19 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from base import Base
+from src.QcloudApi.modules.base import Base
+
 
 class Sec(Base):
     requestHost = 'csec.api.qcloud.com'
+
 
 def main():
     action = 'CaptchaQuery'
     config = {
         'Region': 'gz',
-        'secretId': '你的secretId',
-        'secretKey': '你的secretKey',
+        'secretId': '',
+        'secretKey': '',
         'method': 'get'
     }
     params = {
@@ -21,7 +23,7 @@ def main():
         'script': 0,
     }
     service = Sec(config)
-    print service.call(action, params)
+    print(service.call(action, params))
 
-if (__name__ == '__main__'):
+if __name__ == '__main__':
     main()

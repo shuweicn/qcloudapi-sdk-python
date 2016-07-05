@@ -2,20 +2,21 @@
 # -*- coding: utf-8 -*-
 import hashlib
 import os
-from base import Base
+from src.QcloudApi.modules.base import Base
+
 
 class Cdn(Base):
     requestHost = 'cdn.api.qcloud.com'
 
-    def UploadCdnEntity(self, params):
+    def upload_cdn_entity(self, params):
         action = 'UploadCdnEntity'
-        if (params.get('entityFile') == None):
-            raise ValueError, 'entityFile can not be empty.'
-        if (os.path.isfile(params['entityFile']) == False):
-            raise ValueError, 'entityFile is not exist.'
+        if not params.get('entityFile'):        # == None
+            raise ValueError('entityFile can not be empty.')
+        if os.path.isfile(params['entityFile'] == False):
+            raise ValueError('entityFile is not exist.')
 
         file = params.pop('entityFile')
-        if ('entityFileMd5' not in params):
+        if 'entityFileMd5' not in params:
             params['entityFileMd5'] = hashlib.md5(open(file, 'rb').read()).hexdigest()
 
         files = {
@@ -24,19 +25,20 @@ class Cdn(Base):
 
         return self.call(action, params, files)
 
+
 def main():
     config = {
         'Region': 'gz',
-        'secretId': '你的secretId',
-        'secretKey': '你的secretKey',
+        'secretId': '',
+        'secretKey': '',
         'method': 'post'
     }
     params = {
-        'entityFileName': '/test.txt',
-        'entityFile': '/tmp/test.txt'
+        'entityFileName': './/test.txt',
+        'entityFile': './/test.txt'
     }
     service = Cdn(config)
-    print service.UploadCdnEntity(params)
+    print(service.upload_cdn_entity(params))
 
-if (__name__ == '__main__'):
+if __name__ == '__main__':
     main()

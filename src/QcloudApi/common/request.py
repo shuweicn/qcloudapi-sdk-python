@@ -3,55 +3,66 @@
 
 import urllib
 import requests
-from sign import Sign
+from src.QcloudApi.common.sign import Sign
+import random
+import time
+
 
 class Request:
+
     timeout = 10
     version = 'SDK_PYTHON_1.1'
-    def __init__(self, secretId, secretKey):
-        self.secretId = secretId
-        self.secretKey = secretKey
 
-    def generateUrl(self, requestHost, requestUri, params, method = 'GET'):
+    def __init__(self, secret_id, secret_key):
+        self.secret_id = secret_id
+        self.secret_key = secret_key
+
+    def generate_url(self, request_host, request_uri, params, method='GET'):
         params['RequestClient'] = Request.version
-        sign = Sign(self.secretId, self.secretKey)
-        params['Signature'] = sign.make(requestHost, requestUri, params, method)
-        params = urllib.urlencode(params)
+        sign = Sign(self.secret_id, self.secret_key)
+        params['Signature'] = sign.make(request_host, request_uri, params, method)
+        params = urllib.parse.urlencode(params)
 
-        url = 'https://%s%s' % (requestHost, requestUri)
-        if (method.upper() == 'GET'):
+        url = 'https://%s%s' % (request_host, request_uri)
+        if method.upper() == 'GET':
             url += '?' + params
-
         return url
 
-    def send(self, requestHost, requestUri, params, files = {}, method = 'GET', debug = 0):
+    def send(self, request_host, request_uri, params, files={}, method='GET', debug=0):
         params['RequestClient'] = Request.version
-        sign = Sign(self.secretId, self.secretKey)
-        params['Signature'] = sign.make(requestHost, requestUri, params, method)
+        sign = Sign(self.secret_id, self.secret_key)
+        params['Signature'] = sign.make(request_host, request_uri, params, method)
 
-        url = 'https://%s%s' % (requestHost, requestUri)
+        url = 'https://%s%s' % (request_host, request_uri)
 
-        if (method.upper() == 'GET'):
+        if method.upper() == 'GET':
             req = requests.get(url, params=params, timeout=Request.timeout, verify=False)
-            if (debug):
-                print 'url:', req.url, '\n'
+            if debug:
+                print('url:', req.url, '\n')
         else:
             req = requests.post(url, data=params, files=files, timeout=Request.timeout, verify=False)
-            if (debug):
-                print 'url:', req.url, '\n'
+            if debug:
+                print('url:', req.url, '\n')
 
         if req.status_code != requests.codes.ok:
             req.raise_for_status()
 
         return req.text
 
-def main():
-    secretId = 123
-    secretKey = 'test'
-    params = {}
-    request = Request(secretId, secretKey)
-    print request.generateUrl('cvm.api.qcloud.com', '/v2/index.php', params)
-    print request.send('cvm.api.qcloud.com', '/v2/index.php', params)
 
-if (__name__ == '__main__'):
+def main():
+    secret_id = ''
+    secret_key = ''
+    params = {
+        'Action': 'DescribeUserInfo',
+        'Nonce': random.randint(100000, 900000),
+        'Region': 'bj',
+        'SecretId': secret_id,
+        'Timestamp': int(time.time()),
+    }
+    request = Request(secret_id, secret_key)
+    print(request.generate_url('trade.api.qcloud.com', '/v2/index.php', params))
+    # print(request.send('trade.api.qcloud.com', '/v2/index.php', params, debug=1))
+
+if __name__ == '__main__':
     main()
