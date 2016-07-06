@@ -31,10 +31,10 @@ class Base:
         self._params['Action'] = action[0].upper() + action[1:]
 
         if 'Region' not in self._params:
-            self._params['Region'] = self.defaultRegion
+            self._params['Region'] = self.default_region
 
         if 'SecretId' not in self._params:
-            self._params['SecretId'] = self.secretId
+            self._params['SecretId'] = self.secret_id
 
         if 'Nonce' not in self._params:
             maxint = int((1 << 63) - 1)
